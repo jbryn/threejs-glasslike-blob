@@ -2,14 +2,11 @@ import './style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { HDRLoader } from 'three/addons/loaders/HDRLoader.js'
-import './perlin-shim.js'
-import PerlinNoise3D from 'perlin-noise-3d'
+import noiseShader from './shaders/simplexNoise3d.glsl?raw'
+import blobShader from './shaders/blob.glsl?raw'
 
 // Resolve assets against the base URL so the build works from a sub-path
 const texturesPath = `${import.meta.env.BASE_URL}textures/`
-
-//initialize noise function
-const noise = new PerlinNoise3D()
 
 //load texture
 const texture = new THREE.TextureLoader().load(`${texturesPath}intro-setup.png`)
@@ -22,6 +19,28 @@ const glassMaterial = new THREE.MeshPhysicalMaterial({
     transmission: 1,
     thickness: 0.7
 })
+
+//deform the sphere in the vertex shader, on top of the built-in physical material
+const blobUniforms = {
+    uTime: { value: 0 },
+    uRadius: { value: 1.15 },
+    uStrength: { value: 0.35 },
+    uFrequency: { value: 0.55 },
+    uSpeed: { value: 0.15 }
+}
+
+glassMaterial.onBeforeCompile = (shader) => {
+    Object.assign(shader.uniforms, blobUniforms)
+
+    shader.vertexShader = shader.vertexShader
+        .replace('#include <common>', `#include <common>\n${noiseShader}\n${blobShader}`)
+        .replace('#include <beginnormal_vertex>', `
+            vec3 blobPosition;
+            vec3 objectNormal;
+            blob(normalize(position), blobPosition, objectNormal);
+        `)
+        .replace('#include <begin_vertex>', 'vec3 transformed = blobPosition;')
+}
 
 //load env map (assigned once loaded, the shader can't compile against an empty texture)
 new HDRLoader().load(`${texturesPath}empty_warehouse_01_1k.hdr`, (hdrEquirect) => {
@@ -45,37 +64,11 @@ plane.position.set(-1,0,-1.5)
 scene.add(plane)
 
 //Sphere
-const sphereGeometry = new THREE.SphereGeometry(1,128,128)
-sphereGeometry.setAttribute('basePosition', sphereGeometry.attributes.position.clone())
-
+const sphereGeometry = new THREE.IcosahedronGeometry(1, 64)
 const sphere = new THREE.Mesh(sphereGeometry, glassMaterial)
+// the shader moves vertices outside the geometry's bounding sphere
+sphere.frustumCulled = false
 scene.add(sphere)
-
-const verticesCount = sphereGeometry.attributes.position.count
-const vertex = new THREE.Vector3()
-
-const updateSphere = (elapsedTime) => {
-    const basePosition = sphere.geometry.getAttribute('basePosition')
-    const position = sphere.geometry.getAttribute('position')
-
-    const k = 0.35
-
-    for (let i = 0; i < verticesCount; i++) {
-        vertex.fromBufferAttribute(basePosition, i)
-
-        let perlin = noise.get(
-            vertex.x * k + elapsedTime * 0.15,
-            vertex.y * k + 1,
-            vertex.z * k
-        )
-        vertex.normalize().multiplyScalar( 2.3 * perlin )
-        position.setXYZ(i, vertex.x, vertex.y, vertex.z)
-
-    }
-
-    sphere.geometry.attributes.position.needsUpdate = true
-    sphere.geometry.computeBoundingSphere()
-}
 
 /**
  * Sizes
@@ -132,7 +125,7 @@ const tick = (timestamp) =>
     timer.update(timestamp)
     const elapsedTime = timer.getElapsed()
 
-    updateSphere(elapsedTime)
+    blobUniforms.uTime.value = elapsedTime
 
     // Update controls
     controls.update()

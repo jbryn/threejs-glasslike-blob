@@ -1,10 +1,10 @@
 # Morphing Glass Sphere
 
-Interactive 3D visualization featuring a morphing glass sphere with Perlin noise-based deformation.
+Interactive 3D visualization featuring a morphing glass sphere, deformed on the GPU with simplex noise.
 
 ## Features
 
-- Glass sphere with dynamic deformation
+- Glass sphere deformed in a vertex shader, with normals recomputed so refraction follows the shape
 - Environment mapping and realistic glass material
 - Interactive camera controls
 - Responsive design
