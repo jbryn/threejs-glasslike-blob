@@ -1,37 +1,32 @@
 import './style.css'
 import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js'
+import './perlin-shim.js'
 import PerlinNoise3D from 'perlin-noise-3d'
-import { MeshBasicMaterial } from 'three'
-import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader.js";
+
+// Resolve assets against the base URL so the build works from a sub-path
+const texturesPath = `${import.meta.env.BASE_URL}textures/`
 
 //initialize noise function
 const noise = new PerlinNoise3D()
 
 //load texture
-const image = new Image()
-const texture = new THREE.Texture(image)
-image.addEventListener('load', () => {
-    texture.needsUpdate = true
-})
-image.src = '/textures/intro-setup.png'
-
-//load env map
-const hdrEquirect = new RGBELoader().load(
-  '/textures/empty_warehouse_01_1k.hdr',  
-  () => { 
-    hdrEquirect.mapping = THREE.EquirectangularReflectionMapping; 
-  }
-);
+const texture = new THREE.TextureLoader().load(`${texturesPath}intro-setup.png`)
+texture.colorSpace = THREE.SRGBColorSpace
 
 //Materials
-const normalMaterial = new THREE.MeshNormalMaterial()
-const basicMaterial = new MeshBasicMaterial({ map: texture })
+const basicMaterial = new THREE.MeshBasicMaterial({ map: texture })
 const glassMaterial = new THREE.MeshPhysicalMaterial({
     roughness: 0,
     transmission: 1,
-    thickness: 0.7,
-    envMap: hdrEquirect
+    thickness: 0.7
+})
+
+//load env map (assigned once loaded, the shader can't compile against an empty texture)
+new HDRLoader().load(`${texturesPath}empty_warehouse_01_1k.hdr`, (hdrEquirect) => {
+    hdrEquirect.mapping = THREE.EquirectangularReflectionMapping
+    glassMaterial.envMap = hdrEquirect
 })
 
 /**
@@ -43,13 +38,7 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
-//light
-const light = new THREE.DirectionalLight('red', 2);
-light.position.set(0, 5, 10);
-// scene.add(light);
-
 //plane
-
 const planeGeometry = new THREE.PlaneGeometry(9,6)
 const plane = new THREE.Mesh(planeGeometry, basicMaterial)
 plane.position.set(-1,0,-1.5)
@@ -57,19 +46,17 @@ scene.add(plane)
 
 //Sphere
 const sphereGeometry = new THREE.SphereGeometry(1,128,128)
-sphereGeometry.setAttribute('basePosition', new THREE.BufferAttribute().copy(sphereGeometry.attributes.position));
+sphereGeometry.setAttribute('basePosition', sphereGeometry.attributes.position.clone())
 
 const sphere = new THREE.Mesh(sphereGeometry, glassMaterial)
-// sphere.position.set(0,0,0)
 scene.add(sphere)
 
-const verticesCount = sphereGeometry.attributes.position.count;
+const verticesCount = sphereGeometry.attributes.position.count
+const vertex = new THREE.Vector3()
 
 const updateSphere = (elapsedTime) => {
     const basePosition = sphere.geometry.getAttribute('basePosition')
     const position = sphere.geometry.getAttribute('position')
-
-    const vertex = new THREE.Vector3()
 
     const k = 0.35
 
@@ -88,7 +75,6 @@ const updateSphere = (elapsedTime) => {
 
     sphere.geometry.attributes.position.needsUpdate = true
     sphere.geometry.computeBoundingSphere()
-    sphere.geometry.update
 }
 
 /**
@@ -138,11 +124,13 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 /**
  * Animate
  */
-const clock = new THREE.Clock()
+const timer = new THREE.Timer()
+timer.connect(document)
 
-const tick = () =>
+const tick = (timestamp) =>
 {
-    const elapsedTime = clock.getElapsedTime()
+    timer.update(timestamp)
+    const elapsedTime = timer.getElapsed()
 
     updateSphere(elapsedTime)
 

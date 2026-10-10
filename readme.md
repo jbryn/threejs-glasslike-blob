@@ -21,9 +21,14 @@ npm install
 # Run local server
 npm run dev
 
-# Build for production
+# Build for production (output in dist/)
 npm run build
+
+# Preview the production build
+npm run preview
 ```
+
+Built with [Three.js](https://threejs.org/) and [Vite](https://vite.dev/).
 
 ## Controls
 
@@ -31,9 +36,9 @@ npm run build
 - Right click + drag: Pan
 - Scroll: Zoom
 
-## Required Files
+## Assets
 
-Place these in your `/textures/` directory:
+Loaded from `public/textures/`:
 
 - `intro-setup.png` - Background texture
 - `empty_warehouse_01_1k.hdr` - Environment map
