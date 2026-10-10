@@ -4,6 +4,8 @@ A morphing glass blob you can drop into any web page as a single HTML tag, plus 
 
 **[Open the playground](https://jbryn.github.io/threejs-glasslike-blob/)**
 
+[![The playground: a glass blob morphing over a photo while presets change its shape and material](.github/preview.webp)](https://jbryn.github.io/threejs-glasslike-blob/)
+
 The blob is a `<glass-blob>` custom element built on [Three.js](https://threejs.org/). The sphere is deformed in a vertex shader with simplex noise, and its normals are recomputed so reflections and refraction follow the shape.
 
 ## Playground
