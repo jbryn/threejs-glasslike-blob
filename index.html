@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glass Blob — generator</title>
+    <meta name="description" content="Tune a morphing glass blob and copy it into your page as a single HTML tag.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23ff4a1c' d='M17 3c7 0 12 5 12 12 0 8-6 14-14 14C8 29 3 24 3 18 3 10 9 3 17 3z'/%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <main class="stage" id="stage">
+        <p class="stage__ghost" aria-hidden="true">your page shows through</p>
+        <glass-blob id="blob"></glass-blob>
+        <p class="stage__caption"><span id="caption">fig. 1</span><span>move the pointer over the glass</span></p>
+    </main>
+
+    <aside class="sheet">
+        <header class="sheet__head">
+            <h1>Glass <em>Blob</em></h1>
+            <p>Tune a blob, copy the tag, paste it into your page.</p>
+        </header>
+
+        <section class="group" aria-labelledby="presets-title">
+            <h2 id="presets-title">Presets</h2>
+            <div class="presets" id="presets"></div>
+        </section>
+
+        <form id="controls" autocomplete="off"></form>
+
+        <section class="group" aria-labelledby="backdrop-title">
+            <h2 id="backdrop-title">Backdrop</h2>
+            <div class="segmented" role="radiogroup" aria-label="Backdrop type">
+                <label><input type="radio" name="backdrop" value="image" checked><span>Image</span></label>
+                <label><input type="radio" name="backdrop" value="none"><span>Transparent</span></label>
+            </div>
+            <p class="note" id="backdrop-note" hidden>A web page can't be refracted, so without an image you get reflections and tint only. Thickness and dispersion have no effect.</p>
+            <div class="backdrop-image" id="backdrop-image">
+                <label class="field">
+                    <span>Image URL</span>
+                    <input type="url" id="image-url" placeholder="https://…" spellcheck="false">
+                </label>
+                <label class="upload">
+                    <input type="file" id="image-file" accept="image/*">
+                    <span>or preview a file from your computer</span>
+                </label>
+                <p class="note" id="image-note" hidden></p>
+            </div>
+        </section>
+
+        <section class="group export" aria-labelledby="export-title">
+            <h2 id="export-title">Take it with you</h2>
+            <pre class="code"><code id="embed"></code></pre>
+            <div class="actions">
+                <button type="button" class="button button--primary" id="copy-embed">Copy embed code</button>
+                <button type="button" class="button" id="copy-link">Copy link</button>
+                <button type="button" class="button" id="download">Download PNG</button>
+            </div>
+        </section>
+    </aside>
+
+    <script type="module" src="/src/playground.js"></script>
+</body>
+</html>
