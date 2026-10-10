@@ -158,15 +158,9 @@ body
 .sheet__head h1
 {
     font-weight: 500;
-    font-size: 38px;
+    font-size: 28px;
     line-height: 1;
     letter-spacing: -0.07em;
-}
-
-.sheet__head em
-{
-    font-weight: 400;
-    color: var(--accent);
 }
 
 .sheet__head p
@@ -561,11 +555,6 @@ input[type='color']::-moz-color-swatch
     .sheet
     {
         padding: 24px 20px 32px;
-    }
-
-    .sheet__head h1
-    {
-        font-size: 32px;
     }
 
     .stage__caption
