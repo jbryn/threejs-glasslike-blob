@@ -1,16 +1,15 @@
-uniform float uTime;
-uniform float uRadius;
+uniform float uPhase;
+uniform float uSeed;
 uniform float uStrength;
 uniform float uFrequency;
-uniform float uSpeed;
 
 // Point on the blob surface along a unit direction from its centre
 vec3 blobSurface(vec3 direction)
 {
-    vec3 p = direction * uFrequency + vec3(uTime * uSpeed, 1.0, 0.0);
+    vec3 p = direction * uFrequency + vec3(uPhase, 1.0, 0.0) + uSeed;
     float n = snoise(p) + 0.2 * snoise(p * 2.0 + 7.3);
 
-    return direction * (uRadius + uStrength * n);
+    return direction * (1.0 + uStrength * n);
 }
 
 // Displaced position and its normal, taken from two nearby points on the surface
