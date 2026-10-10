@@ -2,6 +2,8 @@
 
 A morphing glass blob you can drop into any web page as a single HTML tag, plus a playground for tuning it.
 
+**[Open the playground](https://jbryn.github.io/threejs-glasslike-blob/)**
+
 The blob is a `<glass-blob>` custom element built on [Three.js](https://threejs.org/). The sphere is deformed in a vertex shader with simplex noise, and its normals are recomputed so reflections and refraction follow the shape.
 
 ## Playground
@@ -18,7 +20,7 @@ The playground (`index.html`) lets you:
 Load the script once, then use the tag wherever you want a blob. Give it a height (it is `400px` tall and full width by default).
 
 ```html
-<script type="module" src="https://YOUR-SITE/glass-blob.js"></script>
+<script type="module" src="https://jbryn.github.io/threejs-glasslike-blob/glass-blob.js"></script>
 
 <glass-blob
   image="https://example.com/photo.jpg"
@@ -65,5 +67,7 @@ npm run preview
 ```
 
 The build produces the playground and a standalone `dist/glass-blob.js`. The embed code shown in the playground points at `glass-blob.js` next to the page, so it is only valid for a built and deployed copy, not for `npm run dev`.
+
+Pushing to `master` deploys the build to GitHub Pages through `.github/workflows/deploy.yml`.
 
 Built with [Three.js](https://threejs.org/) and [Vite](https://vite.dev/).
